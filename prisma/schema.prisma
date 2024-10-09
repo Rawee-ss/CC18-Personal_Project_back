@@ -9,22 +9,23 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id       Int        @id @default(autoincrement())
-  name     String?
-  image    String?
-  userName String     @unique @map("user_name")
-  password String
-  email    String?
-  role     Role       @default(USER)
-  favorite Favorite[]
-  store    Store[]
-  cart     Cart[]
-  orders   Orders[]
+  id        Int        @id @default(autoincrement())
+  firstName String?
+  lastName  String?
+  image     String?
+  userName  String     @unique @map("user_name")
+  password  String
+  email     String?    @unique
+  role      Role       @default(USER)
+  favorite  Favorite[]
+  store     Store[]
+  cart      Cart[]
+  orders    Orders[]
 }
 
 enum Role {
@@ -39,12 +40,14 @@ model Products {
   detail     String
   price      Decimal     @db.Decimal(10, 2)
   createAt   DateTime    @default(now()) @map("create_at") @db.Timestamp(0)
+  isDelete   Boolean     @default(false)
   categoryId Int         @map("category_id")
   category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   Favorite   Favorite[]
   store      Store[]
   cart       Cart[]
   orderItem  OrderItem[]
+  CartItem   CartItem[]
 }
 
 model OrderItem {
@@ -58,28 +61,23 @@ model OrderItem {
 }
 
 model Orders {
-  id          Int          @id @default(autoincrement())
-  createAt    DateTime     @default(now()) @map("create_at") @db.Timestamp(0)
-  totalPrice  Decimal      @map("total_price") @db.Decimal(10, 2)
-  userId      Int          @map("user_id")
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orderItem   OrderItem[]
-  transaction Transaction?
-}
-
-model Transaction {
   id            Int           @id @default(autoincrement())
-  slip          String        @unique
   createAt      DateTime      @default(now()) @map("create_at") @db.Timestamp(0)
-  updateAt      DateTime      @updatedAt @map("update_at") @db.Timestamp(0)
+  totalPrice    Decimal       @map("total_price") @db.Decimal(10, 2)
   paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
-  ordersId      Int           @unique @map("orders_id")
-  orders        Orders        @relation(fields: [ordersId], references: [id], onDelete: Cascade)
+  slip          String
+  updateAt      DateTime      @updatedAt @map("update_at") @db.Timestamp(0)
+  userId        Int           @map("user_id")
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartId        Int
+  cart          Cart          @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  orderItem     OrderItem[]
 }
 
 enum PaymentStatus {
   PENDING
   COMPLETED
+  FAIL
 
   @@map("payment_status")
 }
@@ -114,9 +112,21 @@ enum Status {
 }
 
 model Cart {
+  id         Int        @id @default(autoincrement())
+  userId     Int        @map("user_id")
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productsId Int        @map("products_id")
+  products   Products   @relation(fields: [productsId], references: [id], onDelete: Cascade)
+  CartItem   CartItem[]
+  Orders     Orders[]
+}
+
+model CartItem {
   id         Int      @id @default(autoincrement())
-  userId     Int      @map("user_id")
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productsId Int      @map("products_id")
   products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
+  cartId     Int
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@map("cart_item")
 }
