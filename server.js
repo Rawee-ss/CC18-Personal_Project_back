@@ -9,9 +9,10 @@ const favoriteRoute = require("./routes/favorite-route");
 const cartRoute = require("./routes/cart-route");
 const cartItemRoute = require("./routes/cart-item-route");
 const orderRoute = require("./routes/order-route");
-const storeRoute = require("./routes/store-route")
-const notFound = require("./middleware/not-found")
-const error = require("./middleware/error")
+const storeRoute = require("./routes/store-route");
+const categoryRoute = require("./routes/category-route");
+const notFound = require("./middleware/not-found");
+const error = require("./middleware/error");
 const cors = require("cors");
 
 app.use(cors());
@@ -24,14 +25,15 @@ app.use(morgan("dev"));
 app.use("/auth", authRouth);
 app.use("/profile", profileRoute);
 app.use("/product", productRoute);
+app.use("/category", categoryRoute);
 app.use("/favorite", favoriteRoute);
 app.use("/cart", cartRoute);
 app.use("/cartItem", cartItemRoute);
 app.use("/order", orderRoute);
 app.use("/store", storeRoute);
 
-app.use(notFound)
-app.use(error)
+app.use(notFound);
+app.use(error);
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {

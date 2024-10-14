@@ -30,7 +30,7 @@ exports.register = async (req, res, next) => {
       data: {
         userName,
         email,
-        birthday,
+        // birthday,
         password: hashedPassword,
       },
     });
@@ -58,11 +58,36 @@ exports.login = async (req, res, next) => {
     if (!isPasswordValid) {
       return createError(401, "Invalid userName or password");
     }
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
+
+    const payload = {
+      id: user.id,
+      role: user.role
+    }
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1h",
     });
 
-    res.json({ message: "login now", token });
+    res.json({ user:payload, token });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.currentUser = async (req, res, next) => {
+  try {
+    const userName = req.user.user.userName;
+    const member = await prisma.user.findFirst({
+      where: {
+        userName,
+      },
+      select: {
+        id: true,
+        userName: true,
+        role: true,
+      },
+    });
+    res.json({ member });
   } catch (err) {
     next(err);
   }
