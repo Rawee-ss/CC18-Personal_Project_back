@@ -37,18 +37,18 @@ enum Role {
 model Products {
   id         Int         @id @default(autoincrement())
   name       String
-  image      String
   detail     String
   price      Decimal     @db.Decimal(10, 2)
-  createAt   DateTime    @default(now()) @map("create_at") @db.Timestamp(0)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   isDelete   Boolean     @default(false)
   categoryId Int         @map("category_id")
   category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  Favorite   Favorite[]
+  favorite   Favorite[]
   store      Store[]
   cart       Cart[]
   orderItem  OrderItem[]
-  CartItem   CartItem[]
+  cartItem   CartItem[]
+  image      Image[]
 }
 
 model OrderItem {
@@ -63,11 +63,11 @@ model OrderItem {
 
 model Orders {
   id            Int           @id @default(autoincrement())
-  createAt      DateTime      @default(now()) @map("create_at") @db.Timestamp(0)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
   totalPrice    Decimal       @map("total_price") @db.Decimal(10, 2)
   paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
   slip          String
-  updateAt      DateTime      @updatedAt @map("update_at") @db.Timestamp(0)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
   userId        Int           @map("user_id")
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   cartId        Int
@@ -99,7 +99,7 @@ model Favorite {
 
 model Store {
   id         Int      @id @default(autoincrement())
-  createAt   DateTime @default(now()) @map("create_at") @db.Timestamp(0)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
   status     Status   @default(UNINSTALL)
   userId     Int      @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -118,8 +118,8 @@ model Cart {
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   productsId Int        @map("products_id")
   products   Products   @relation(fields: [productsId], references: [id], onDelete: Cascade)
-  CartItem   CartItem[]
-  Orders     Orders[]
+  cartItem   CartItem[]
+  orders     Orders[]
 }
 
 model CartItem {
@@ -130,4 +130,16 @@ model CartItem {
   cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@map("cart_item")
+}
+
+model Image {
+  id         Int      @id @default(autoincrement())
+  asset_id   String
+  public_id  String
+  url        String
+  secure_url String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
+  productsId Int
 }

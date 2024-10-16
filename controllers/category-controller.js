@@ -1,21 +1,39 @@
-exports.getAllCategory = (req, res, next) => {
-  res.json("get All category");
+const prisma = require("../config/prisma");
+
+exports.getAllCategory = async (req, res, next) => {
+  try {
+    const category = await prisma.category.findMany();
+
+    res.json(category);
+  } catch (err) {
+    next(err);
+  }
 };
+
 exports.createCategory = async (req, res, next) => {
-    try{
-        
-    }catch(err){
-        next(err)
-        
-    }
-    res.json("create category");
+  try {
+    const { name } = req.body;
+    const category = await prisma.category.create({
+      data: {
+        name: name,
+      },
+    });
+    res.json(category);
+  } catch (err) {
+    next(err);
+  }
 };
-exports.deleteCategory = (req, res, next) => {
-    try{
-        const{id} = req.params
-        console.log(id)
-    }catch(err){
-        next(err)
-    }
-  res.json("delete category");
+
+exports.deleteCategory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const category = await prisma.category.delete({
+        where: { 
+            id: Number(id)
+        }
+    });
+    res.json("delete category success",category);
+  } catch (err) {
+    next(err);
+  }
 };

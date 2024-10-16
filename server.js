@@ -10,7 +10,7 @@ const cartRoute = require("./routes/cart-route");
 const cartItemRoute = require("./routes/cart-item-route");
 const orderRoute = require("./routes/order-route");
 const storeRoute = require("./routes/store-route");
-const categoryRoute = require("./routes/category-route");
+const categoryRoute = require("./routes/category-route")
 const notFound = require("./middleware/not-found");
 const error = require("./middleware/error");
 const cors = require("cors");
@@ -19,17 +19,14 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-// app.use("/", (req, res) => {
-//   res.json("Hello Home");
-// });
 app.use("/auth", authRouth);
-app.use("/profile", profileRoute);
-app.use("/product", productRoute);
 app.use("/category", categoryRoute);
-app.use("/favorite", favoriteRoute);
+app.use("/products", productRoute);
+app.use("/profile", profileRoute);
 app.use("/cart", cartRoute);
 app.use("/cartItem", cartItemRoute);
 app.use("/order", orderRoute);
+app.use("/favorite", favoriteRoute);
 app.use("/store", storeRoute);
 
 app.use(notFound);
