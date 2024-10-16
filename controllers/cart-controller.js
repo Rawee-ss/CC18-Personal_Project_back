@@ -2,49 +2,76 @@ const prisma = require("../config/prisma");
 
 exports.addItemCart = async (req, res, next) => {
   try {
-    //code
     const { cart } = req.body;
+
     console.log(cart);
     console.log(req.user.id);
 
     const user = await prisma.user.findFirst({
       where: { id: Number(req.user.id) },
     });
+
     // console.log(user)
-    // Deleted old Cart item
-    await prisma.cartItem.deleteMany({
+
+    const existingstore = await prisma.store.findFirst({
       where: {
-        cart: {
-          orderedById: user.id,
-        },
+        userId: user.id,
+        productsId: cart[0].id,
       },
     });
-    // ลบสินค้าตัวเก่าที่ค้างอยู่ใน cart
-    await prisma.cart.deleteMany({
-      where: { orderedById: user.id },
+
+    if (existingstore) {
+      return res.status(400).json({
+        message: "Product already in store. Only one item can be added.",
+      });
+    }
+
+    const existingCartItem = await prisma.cartItem.findFirst({
+      where: {
+        cart: { userId: user.id },
+        productsId: cart[0].id,
+      },
     });
+
+    if (existingCartItem) {
+      return res.json(
+        400,
+        "Product already in cart. Only one item can be added."
+      );
+    }
+
+    // Deleted old Cart item
+    // await prisma.cartItem.deleteMany({
+    //   where: {
+    //     cart: {
+    //       userId: user.id,
+    //     },
+    //   },
+    // });
+    // // ลบสินค้าตัวเก่าที่ค้างอยู่ใน cart
+    // await prisma.cart.deleteMany({
+    //   where: { userId: user.id },
+    // });
 
     // เตรียมสินค้า
     let products = cart.map((item) => ({
-      productId: item.id,
-      count: item.count,
+      productsId: item.id,
       price: item.price,
     }));
 
-    // หาผลรวม
-    let cartTotal = products.reduce(
-      (sum, item) => sum + item.price * item.count,
-      0
-    );
+    // console.log(products);
+
+    //  หาผลรวม
+    let cartTotal = products.reduce((sum, item) => sum + item.price, 0);
 
     // New cart
     const newCart = await prisma.cart.create({
       data: {
-        products: {
+        cartItem: {
           create: products,
         },
         cartTotal: cartTotal,
-        orderedById: user.id,
+        userId: user.id,
       },
     });
     console.log(newCart);
@@ -53,59 +80,53 @@ exports.addItemCart = async (req, res, next) => {
     next(err);
   }
 };
+
 exports.getItemCart = async (req, res, next) => {
   try {
-    //code
-    // req.user.id
     const cart = await prisma.cart.findFirst({
       where: {
-        orderedById: Number(req.user.id),
+        userId: Number(req.user.id),
       },
       include: {
-        products: {
+        cartItem: {
           include: {
-            product: true,
+            products: true,
           },
         },
       },
     });
     // console.log(cart)
     res.json({
-      products: cart.products,
+      cartItem: cart.cartItem,
       cartTotal: cart.cartTotal,
     });
   } catch (err) {
     next(err);
   }
 };
+
 exports.deleteItemCart = async (req, res, next) => {
   try {
-    //code
+    const { cartItemId } = req.body;
+    if (!cartItemId) {
+      return res.status(400).json({ message: "cartItemId is required" });
+    }
+
     const cart = await prisma.cart.findFirst({
-      where: { orderedById: Number(req.user.id) },
+      where: { userId: Number(req.user.id) },
     });
     if (!cart) {
-      return res.status(400).json({ message: "No cart" });
+      return res.json(400, "No cart");
     }
-    await prisma.productOnCart.deleteMany({
-      where: { cartId: cart.id },
+    await prisma.cartItem.findUnique({
+      where: { id: cartItemId },
     });
-    const result = await prisma.cart.deleteMany({
-      where: { orderedById: Number(req.user.id) },
+    await prisma.cartItem.delete({
+      where: { id: cartItemId },
     });
 
-    console.log(result);
-    res.json({
-      message: "Cart Empty Success",
-      deletedCount: result.count,
-    });
+    res.json("Cart remove Success");
   } catch (err) {
     next(err);
   }
 };
-
-
-
-
-
-

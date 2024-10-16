@@ -39,13 +39,12 @@ model Products {
   name       String
   detail     String
   price      Decimal     @db.Decimal(10, 2)
-  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   isDelete   Boolean     @default(false)
   categoryId Int         @map("category_id")
   category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   favorite   Favorite[]
   store      Store[]
-  cart       Cart[]
   orderItem  OrderItem[]
   cartItem   CartItem[]
   image      Image[]
@@ -53,6 +52,7 @@ model Products {
 
 model OrderItem {
   id         Int      @id @default(autoincrement())
+  price      Float
   productsId Int      @map("products_id")
   products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
   ordersId   Int      @map("orders_id")
@@ -63,11 +63,11 @@ model OrderItem {
 
 model Orders {
   id            Int           @id @default(autoincrement())
-  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
   totalPrice    Decimal       @map("total_price") @db.Decimal(10, 2)
   paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
   slip          String
-  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
   userId        Int           @map("user_id")
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   cartId        Int
@@ -99,7 +99,7 @@ model Favorite {
 
 model Store {
   id         Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(0)
   status     Status   @default(UNINSTALL)
   userId     Int      @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -113,17 +113,17 @@ enum Status {
 }
 
 model Cart {
-  id         Int        @id @default(autoincrement())
-  userId     Int        @map("user_id")
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productsId Int        @map("products_id")
-  products   Products   @relation(fields: [productsId], references: [id], onDelete: Cascade)
-  cartItem   CartItem[]
-  orders     Orders[]
+  id        Int        @id @default(autoincrement())
+  cartTotal Float
+  userId    Int        @map("user_id")
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartItem  CartItem[]
+  orders    Orders[]
 }
 
 model CartItem {
   id         Int      @id @default(autoincrement())
+  price      Float
   productsId Int      @map("products_id")
   products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
   cartId     Int
