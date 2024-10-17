@@ -1,9 +1,10 @@
 const express = require("express");
 const orderRoute = express.Router();
-const orderController = require("../controllers/order-controller")
+const orderController = require("../controllers/order-controller");
+const { authCheck } = require("../middleware/authenticate");
 
 orderRoute.get("/", orderController.getAllOrder);
-orderRoute.patch("/:id", orderController.createOrder);
+orderRoute.post("/", authCheck, orderController.createOrder);
 orderRoute.delete("/:id", orderController.deleteOrder);
 
 //Admin

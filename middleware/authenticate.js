@@ -2,57 +2,51 @@ const prisma = require("../config/prisma");
 const createError = require("../utils/createError");
 const jwt = require("jsonwebtoken");
 
-
-
 exports.authCheck = async (req, res, next) => {
   try {
-      //code
-      const headerToken = req.headers.authorization
-      if (!headerToken) {
-          return res.status(401).json({ message: "No Token, Authorization" })
-      }
-      const token = headerToken.split(" ")[1]
-      const decode = jwt.verify(token, process.env.JWT_SECRET)
-      req.user = decode
+    //code
+    const headerToken = req.headers.authorization;
+    if (!headerToken) {
+      return res.status(401).json({ message: "No Token, Authorization" });
+    }
+    const token = headerToken.split(" ")[1];
+    const decode = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decode;
+    console.log(decode,"decode")
 
-      const user = await prisma.user.findFirst({
-          where: {
-              userName: req.user.userName
-          }
-      })
-      if (!user) {
-          return res.status(400).json({ message: 'This account cannot access' })
-      }
+    const user = await prisma.user.findFirst({
+      where: {
+      id: req.user.id,
+      },
+    });
+    if (!user) {
+      return res.status(400).json({ message: "This account cannot access" });
+    }
+    req.user = user;
 
-      next()
+    next();
   } catch (err) {
-      console.log(err)
-      res.status(500).json({ message: 'Token Invalid' })
+    console.log(err);
+    res.status(500).json({ message: "Token Invalid" });
   }
-}
-
+};
 
 exports.adminCheck = async (req, res, next) => {
   try {
-      const { userName } = req.user
-      const adminUser = await prisma.user.findFirst({
-          where: { userName: userName }
-      })
-      if (!adminUser || adminUser.role !== 'ADMIN') {
-          return res.status(403).json({ message: 'Acess Denied: Admin Only' })
-      }
-      // console.log('admin check', adminUser)
-      next()
+    const { userName } = req.user;
+    const adminUser = await prisma.user.findFirst({
+      where: { userName: userName },
+    });
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acess Denied: Admin Only" });
+    }
+    // console.log('admin check', adminUser)
+    next();
   } catch (err) {
-      console.log(err)
-      res.status(500).json({ message: 'Error Admin access denied' })
+    console.log(err);
+    res.status(500).json({ message: "Error Admin access denied" });
   }
-}
-
-
-
-
-
+};
 
 // module.exports = (roles = []) => {
 //   return async (req, res, next) => {
@@ -82,8 +76,6 @@ exports.adminCheck = async (req, res, next) => {
 //   };
 // };
 
-
-
 // exports.authorization = (req, res, next) => {
 //   const token = req.header('Authorization').replace('Bearer ', '');
 
@@ -93,7 +85,7 @@ exports.adminCheck = async (req, res, next) => {
 
 //   try {
 //     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     req.user = decoded; 
+//     req.user = decoded;
 //     next();
 //   } catch (err) {
 //     res.status(401).json({ error: 'Invalid token' });

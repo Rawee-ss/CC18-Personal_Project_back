@@ -3,19 +3,27 @@ const prisma = require("../config/prisma");
 exports.addItemCart = async (req, res, next) => {
   try {
     const { cart } = req.body;
+    const { id } = req.user;
 
     console.log(cart);
-    console.log(req.user.id);
+    console.log(id);
 
-    const user = await prisma.user.findFirst({
-      where: { id: Number(req.user.id) },
+    let userCart = await prisma.cart.findFirst({
+      where: { userId: Number(id) },
     });
 
-    // console.log(user)
+    if (!userCart) {
+      userCart = await prisma.cart.create({
+        data: {
+          cartTotal: 0.0,
+          userId: id,
+        },
+      });
+    }
 
     const existingstore = await prisma.store.findFirst({
       where: {
-        userId: user.id,
+        userId: id,
         productsId: cart[0].id,
       },
     });
@@ -28,7 +36,7 @@ exports.addItemCart = async (req, res, next) => {
 
     const existingCartItem = await prisma.cartItem.findFirst({
       where: {
-        cart: { userId: user.id },
+        cart: { userId: id },
         productsId: cart[0].id,
       },
     });
@@ -40,41 +48,25 @@ exports.addItemCart = async (req, res, next) => {
       );
     }
 
-    // Deleted old Cart item
-    // await prisma.cartItem.deleteMany({
-    //   where: {
-    //     cart: {
-    //       userId: user.id,
-    //     },
-    //   },
-    // });
-    // // ลบสินค้าตัวเก่าที่ค้างอยู่ใน cart
-    // await prisma.cart.deleteMany({
-    //   where: { userId: user.id },
-    // });
-
-    // เตรียมสินค้า
     let products = cart.map((item) => ({
       productsId: item.id,
       price: item.price,
+      cartId: userCart.id,
     }));
 
-    // console.log(products);
+    // let cartTotal = products.reduce((sum, item) => sum + item.price, 0);
 
-    //  หาผลรวม
-    let cartTotal = products.reduce((sum, item) => sum + item.price, 0);
-
-    // New cart
-    const newCart = await prisma.cart.create({
-      data: {
-        cartItem: {
-          create: products,
-        },
-        cartTotal: cartTotal,
-        userId: user.id,
-      },
+    const newCart = await prisma.cartItem.createMany({
+      data: products,
     });
     console.log(newCart);
+    // await prisma.cart.create({
+    //   data: {
+    //     cartTotal: cartTotal,
+    //     userId: id,
+    //   },
+    // });
+
     res.json("Add Cart success");
   } catch (err) {
     next(err);
@@ -125,7 +117,7 @@ exports.deleteItemCart = async (req, res, next) => {
       where: { id: cartItemId },
     });
 
-    res.json("Cart remove Success");
+    res.json("Cart remove item Success");
   } catch (err) {
     next(err);
   }

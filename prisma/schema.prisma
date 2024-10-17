@@ -126,7 +126,7 @@ model CartItem {
   price      Float
   productsId Int      @map("products_id")
   products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
-  cartId     Int
+  cartId     Int      @map("cart_id")
   cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@map("cart_item")

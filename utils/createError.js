@@ -3,4 +3,4 @@ const createError = (statusCode, message) => {
   error.statusCode = statusCode;
   throw error;
 };
-module.exports = createError;
+module.exports  = createError;

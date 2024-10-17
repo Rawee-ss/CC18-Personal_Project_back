@@ -5,7 +5,6 @@ const { authCheck } = require("../middleware/authenticate");
 
 cartRoute.post("/", authCheck, cartController.addItemCart);
 cartRoute.get("/", authCheck, cartController.getItemCart);
-// cartRoute.patch("/:id", authCheck, cartController.updateCart);
 cartRoute.delete("/", authCheck, cartController.deleteItemCart);
 
 module.exports = cartRoute;
