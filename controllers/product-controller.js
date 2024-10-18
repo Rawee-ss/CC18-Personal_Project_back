@@ -1,6 +1,7 @@
 const prisma = require("../config/prisma");
 const cloudinary = require("../config/cloudinary");
-const fs = require("fs");
+const fs = require("fs/promises");
+const path = require("path");
 
 exports.getAllProduct = async (req, res, next) => {
   try {
@@ -14,8 +15,8 @@ exports.getAllProduct = async (req, res, next) => {
         // image: true,
       },
     });
-    console.log(products)
-    res.json({products});
+    console.log(products);
+    res.json({ products });
   } catch (err) {
     next(err);
   }
@@ -42,12 +43,14 @@ exports.createProduct = async (req, res, next) => {
 
     const haveFile = !!req.file;
     let uploadResult = {};
+    console.log(path.parse(req.file.path).name);
     if (haveFile) {
       uploadResult = await cloudinary.uploader.upload(req.file.path, {
         overwrite: true,
+
         public_id: path.parse(req.file.path).name,
       });
-      fs.unlink(req.file.path);
+      await fs.unlink(req.file.path);
     }
 
     const product = await prisma.products.create({
