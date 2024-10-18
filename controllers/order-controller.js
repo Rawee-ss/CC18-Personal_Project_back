@@ -1,9 +1,12 @@
 const prisma = require("../config/prisma");
 const { cartItem } = require("../config/prisma");
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 
 exports.getAllOrder = (req, res) => {
   res.json("get all order");
 };
+
 exports.createOrder = async (req, res, next) => {
   try {
     const { id } = req.user;
@@ -28,6 +31,14 @@ exports.createOrder = async (req, res, next) => {
       0
     );
 
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'slips', 
+    });
+
+    fs.unlinkSync(req.file.path);
+
+    const slipURL = result.secure_url;
+
     // // Create a new Order
     const createInOrder = await prisma.orders.create({
       data: {
@@ -37,12 +48,10 @@ exports.createOrder = async (req, res, next) => {
             price: item.price,
           })),
         },
-        user: {
-          connect: { userId: id },
-        },
+        userId: id ,
         totalPrice: cartTotal,
         paymentStatus: "PENDING",
-        slip: slipURL,
+        slip: slipURL
       },
     });
     console.log(createInOrder);
@@ -65,8 +74,7 @@ exports.createOrder = async (req, res, next) => {
     res.json("hi");
     // res.json({ ok: true, order });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Server Error" });
+    next(err)
   }
 };
 

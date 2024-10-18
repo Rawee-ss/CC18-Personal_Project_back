@@ -11,10 +11,11 @@ exports.getAllProduct = async (req, res, next) => {
       orderBy: { createdAt: "desc" },
       include: {
         category: true,
-        image: true,
+        // image: true,
       },
     });
-    res.json(products);
+    console.log(products)
+    res.json({products});
   } catch (err) {
     next(err);
   }
@@ -35,24 +36,27 @@ exports.productby = async (req, res, next) => {
   }
 };
 
-exports.createProduct = async (req, res) => {
+exports.createProduct = async (req, res, next) => {
   try {
-    // code
     const { name, image, price, detail, categoryId } = req.body;
+
+    const haveFile = !!req.file;
+    let uploadResult = {};
+    if (haveFile) {
+      uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        overwrite: true,
+        public_id: path.parse(req.file.path).name,
+      });
+      fs.unlink(req.file.path);
+    }
+
     const product = await prisma.products.create({
       data: {
         name: name,
         detail: detail,
         price: parseFloat(price),
         categoryId: parseInt(categoryId),
-        image: {
-          create: image.map((item) => ({
-            asset_id: item.asset_id,
-            public_id: item.public_id,
-            url: item.url,
-            secure_url: item.secure_url,
-          })),
-        },
+        image: uploadResult.secure_url || "",
       },
     });
     res.json(product);
@@ -61,11 +65,20 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-
 exports.updateProduct = async (req, res, next) => {
   const { id } = req.params;
   const { name, image, detail, price, categoryId } = req.body;
   try {
+    const haveFile = !!req.file;
+    let uploadResult = {};
+    if (haveFile) {
+      uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        overwrite: true,
+        public_id: path.parse(req.file.path).name,
+      });
+      fs.unlink(req.file.path);
+    }
+
     const updatedProduct = await prisma.products.update({
       where: { id: parseInt(id) },
       data: {
@@ -73,14 +86,7 @@ exports.updateProduct = async (req, res, next) => {
         detail: detail,
         price: parseFloat(price),
         categoryId: parseInt(categoryId),
-        image: {
-          create: image.map((item) => ({
-            asset_id: item.asset_id,
-            public_id: item.public_id,
-            url: item.url,
-            secure_url: item.secure_url,
-          })),
-        },
+        image: uploadResult.secure_url || "",
       },
     });
     res.json(updatedProduct);
@@ -96,15 +102,12 @@ exports.deleteProduct = async (req, res, next) => {
       where: { id: parseInt(id) },
       data: { isDelete: true },
     });
-    
+
     res.json("Product deleted successfully");
   } catch (err) {
     next(err);
   }
 };
-
-
-
 
 exports.searchFilters = async (req, res, next) => {
   try {

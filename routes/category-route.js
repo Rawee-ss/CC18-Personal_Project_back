@@ -5,14 +5,12 @@ const { authCheck, adminCheck } = require("../middleware/authenticate");
 
 categoryRoute.get(
   "/",
-  authCheck,
-  adminCheck,
+  // authCheck,
+  // adminCheck,
   categoryController.getAllCategory
 );
 categoryRoute.post(
   "/",
-  authCheck,
-  adminCheck,
   categoryController.createCategory
 );
 categoryRoute.delete(

@@ -19,6 +19,7 @@ exports.authCheck = async (req, res, next) => {
       id: req.user.id,
       },
     });
+    
     if (!user) {
       return res.status(400).json({ message: "This account cannot access" });
     }
@@ -40,7 +41,7 @@ exports.adminCheck = async (req, res, next) => {
     if (!adminUser || adminUser.role !== "ADMIN") {
       return res.status(403).json({ message: "Acess Denied: Admin Only" });
     }
-    // console.log('admin check', adminUser)
+    console.log('admin check', adminUser)
     next();
   } catch (err) {
     console.log(err);

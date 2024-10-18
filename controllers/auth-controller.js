@@ -76,7 +76,9 @@ exports.login = async (req, res, next) => {
 
 exports.currentUser = async (req, res, next) => {
   try {
-    const userName = req.user.user.userName;
+    console.log("CURRENT USER")
+    console.log(req.user)
+    const userName = req.user.userName;
     const member = await prisma.user.findFirst({
       where: {
         userName,

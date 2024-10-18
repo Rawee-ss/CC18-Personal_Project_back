@@ -5,7 +5,7 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         // const { id } = req.user //มาจาก authenticate
         // // console.log(id)
-        const fullFilename = `${Date.now()}_${Math.random() * 1000}${path.extname(file.originalname)}` //ทำให้ชื่อไฟล์ไม่ซ้ำกัน //path.extคือนามสกุล
+        const fullFilename = `${Date.now()}_${Math.random() * 1000}${path.extname(file.originalname)}` 
         cb(null, fullFilename)
     }
 })

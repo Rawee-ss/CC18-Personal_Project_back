@@ -8,16 +8,33 @@ const usersData = [
     userName: "Manager",
     email: "manager@games.com",
     password: hashedPassword,
-    role: "ADMIN"
+    role: "ADMIN",
   },
   {
     userName: "Anny",
     email: "anny@games.com",
     password: hashedPassword,
-    role: "USER"
+    role: "USER",
   },
 
-
+  {
+    userName: "Bobby",
+    email: "anny@games.com",
+    password: hashedPassword,
+    role: "USER",
+  },
+  {
+    userName: "Candy",
+    email: "anny@games.com",
+    password: hashedPassword,
+    role: "USER",
+  },
+  {
+    userName: "Danny",
+    email: "anny@games.com",
+    password: hashedPassword,
+    role: "USER",
+  },
 ];
 
 async function run() {

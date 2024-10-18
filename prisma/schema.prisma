@@ -38,6 +38,7 @@ model Products {
   id         Int         @id @default(autoincrement())
   name       String
   detail     String
+  image      String
   price      Decimal     @db.Decimal(10, 2)
   createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   isDelete   Boolean     @default(false)
@@ -47,7 +48,6 @@ model Products {
   store      Store[]
   orderItem  OrderItem[]
   cartItem   CartItem[]
-  image      Image[]
 }
 
 model OrderItem {
@@ -66,7 +66,7 @@ model Orders {
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp(0)
   totalPrice    Decimal       @map("total_price") @db.Decimal(10, 2)
   paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
-  slip          String
+  slip          String?
   updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamp(0)
   userId        Int           @map("user_id")
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -130,16 +130,4 @@ model CartItem {
   cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
 
   @@map("cart_item")
-}
-
-model Image {
-  id         Int      @id @default(autoincrement())
-  asset_id   String
-  public_id  String
-  url        String
-  secure_url String
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
-  productsId Int
 }
