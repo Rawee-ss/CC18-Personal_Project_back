@@ -69,21 +69,26 @@ exports.createProduct = async (req, res, next) => {
 };
 
 exports.updateProduct = async (req, res, next) => {
-  const { id } = req.params;
-  const { name, image, detail, price, categoryId } = req.body;
   try {
+    const { name, image, price, detail, categoryId } = req.body;
+    const {id} = req.params
+
+    console.log(id,"Product id")
+
     const haveFile = !!req.file;
     let uploadResult = {};
+    console.log(path.parse(req.file.path).name);
     if (haveFile) {
       uploadResult = await cloudinary.uploader.upload(req.file.path, {
         overwrite: true,
+
         public_id: path.parse(req.file.path).name,
       });
-      fs.unlink(req.file.path);
+      await fs.unlink(req.file.path);
     }
 
-    const updatedProduct = await prisma.products.update({
-      where: { id: parseInt(id) },
+    const product = await prisma.products.update({
+      where:{id:+id},
       data: {
         name: name,
         detail: detail,
@@ -92,11 +97,12 @@ exports.updateProduct = async (req, res, next) => {
         image: uploadResult.secure_url || "",
       },
     });
-    res.json(updatedProduct);
+    res.json(product);
   } catch (err) {
     next(err);
   }
 };
+
 
 exports.deleteProduct = async (req, res, next) => {
   const { id } = req.params;

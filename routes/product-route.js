@@ -14,7 +14,13 @@ productRoute.post(
 productRoute.get("/:count", productController.getAllProduct); //ข้อมูลที่จะแสดงมีกี่ตัว
 productRoute.post("/productby", productController.productby);
 productRoute.post("/search/filters", productController.searchFilters);
-productRoute.patch("/:id", productController.updateProduct);
+productRoute.patch(
+  "/:id",
+  authCheck,
+  adminCheck,
+  upload.single('image'),
+  productController.updateProduct
+);
 productRoute.delete("/:id", productController.deleteProduct);
 
 module.exports = productRoute;
