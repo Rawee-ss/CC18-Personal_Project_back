@@ -22,6 +22,22 @@ exports.getAllProduct = async (req, res, next) => {
   }
 };
 
+exports.getProduct = async (req, res, next) => {
+  try {
+    // code
+    const { id } = req.params;
+    const products = await prisma.products.findFirst({
+      where: {
+        id: +id,
+      },
+    });
+    console.log(products);
+    res.json({ products });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.productby = async (req, res, next) => {
   try {
     const { sort, orders, limit } = req.body;
@@ -71,9 +87,9 @@ exports.createProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
   try {
     const { name, image, price, detail, categoryId } = req.body;
-    const {id} = req.params
+    const { id } = req.params;
 
-    console.log(id,"Product id")
+    console.log(id, "Product id");
 
     const haveFile = !!req.file;
     let uploadResult = {};
@@ -88,7 +104,7 @@ exports.updateProduct = async (req, res, next) => {
     }
 
     const product = await prisma.products.update({
-      where:{id:+id},
+      where: { id: +id },
       data: {
         name: name,
         detail: detail,
@@ -102,7 +118,6 @@ exports.updateProduct = async (req, res, next) => {
     next(err);
   }
 };
-
 
 exports.deleteProduct = async (req, res, next) => {
   const { id } = req.params;

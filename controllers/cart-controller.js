@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const createError = require("../utils/createError");
 
 exports.addItemCart = async (req, res, next) => {
   try {
@@ -29,9 +30,10 @@ exports.addItemCart = async (req, res, next) => {
     });
 
     if (existingstore) {
-      return res.status(400).json({
-        message: "Product already in store. Only one item can be added.",
-      });
+      return createError(
+        400,
+        "Product already in store. Only one item can be added."
+      );
     }
 
     const existingCartItem = await prisma.cartItem.findFirst({
@@ -42,22 +44,34 @@ exports.addItemCart = async (req, res, next) => {
     });
 
     if (existingCartItem) {
-      return res.json(
+      return createError(
         400,
         "Product already in cart. Only one item can be added."
       );
     }
+    const findProduct = await prisma.products.findFirst({
+      where: {
+        id: +productsId,
+      },
+    });
+    if (!findProduct) {
+      return createError(400, "Not Product");
+    }
 
-    let products = cart.map((item) => ({
-      productsId: item.id,
-      price: item.price,
-      cartId: userCart.id,
-    }));
+    // let products = cart.map((item) => ({
+    //   productsId: item.id,
+    //   price: item.price,
+    //   cartId: userCart.id,
+    // }));
 
     // let cartTotal = products.reduce((sum, item) => sum + item.price, 0);
 
-    const newCart = await prisma.cartItem.createMany({
-      data: products,
+    const newCart = await prisma.cartItem.create({
+      data: {
+        productsId: +productsId,
+        price: findProduct.price,
+        cartId: userCart.id,
+      },
     });
     console.log(newCart);
     // await prisma.cart.create({

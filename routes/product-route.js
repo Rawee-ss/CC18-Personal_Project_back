@@ -12,6 +12,7 @@ productRoute.post(
   productController.createProduct
 );
 productRoute.get("/:count", productController.getAllProduct); 
+productRoute.get("/detail/:id", productController.getProduct); 
 // productRoute.post("/productby", productController.productby);
 productRoute.post("/search/filters", productController.searchFilters);
 productRoute.patch(
