@@ -2,10 +2,10 @@ const prisma = require("../config/prisma");
 
 exports.addItemCart = async (req, res, next) => {
   try {
-    const { cart } = req.body;
+    const { productsId } = req.params;
     const { id } = req.user;
 
-    console.log(cart);
+    console.log(productsId);
     console.log(id);
 
     let userCart = await prisma.cart.findFirst({
@@ -24,7 +24,7 @@ exports.addItemCart = async (req, res, next) => {
     const existingstore = await prisma.store.findFirst({
       where: {
         userId: id,
-        productsId: cart[0].id,
+        productsId: +productsId,
       },
     });
 
@@ -37,7 +37,7 @@ exports.addItemCart = async (req, res, next) => {
     const existingCartItem = await prisma.cartItem.findFirst({
       where: {
         cart: { userId: id },
-        productsId: cart[0].id,
+        productsId: +productsId,
       },
     });
 

@@ -23,67 +23,33 @@ exports.getOrder = async (req, res, next) => {
   }
 };
 
-
-
-
 // ทำใหม่
 exports.createOrder = async (req, res, next) => {
   try {
+    const { id, name, slip, totalPrice, cartId } = req.body;
+    console.log("req.body", req.body);
+    const haveFile = !!req.file;
+    let uploadResult = {};
+    console.log(path.parse(req.file.path).name);
+    // if (haveFile) {
+    //   uploadResult = await cloudinary.uploader.upload(req.file.path, {
+    //     overwrite: true,
 
-
-    
-    // const { id } = req.user;
-    // console.log(id);
-    // // Step 1 Get User Cart
-    // let userCart = await prisma.cart.findFirst({
-    //   where: {
-    //     userId: Number(id),
-    //   },
-    //   include: { cartItem: true },
-    // });
-
-    // // console.log(userCart);
-
-    // // Check Cart empty
-    // if (!userCart || userCart.cartItem.length === 0) {
-    //   return res.status(400).json({ ok: false, message: "Cart is Empty" });
+    //     public_id: path.parse(req.file.path).name,
+    //   });
+    //   await fs.unlink(req.file.path);
     // }
 
-    // let cartTotal = userCart.cartItem.reduce(
-    //   (sum, item) => sum + item.price,
-    //   0
-    // );
-
-    // const result = await cloudinary.uploader.upload(req.file.path, {
-    //   folder: "slips",
-    // });
-
-    // fs.unlinkSync(req.file.path);
-
-    // const slipURL = result.secure_url;
-
-    // // // Create a new Order
-    // const createInOrder = await prisma.orders.create({
+    // const product = await prisma.products.create({
     //   data: {
-    //     orderItem: {
-    //       create: userCart.cartItem.map((item) => ({
-    //         productsId: item.productsId,
-    //         price: item.price,
-    //       })),
-    //     },
-    //     userId: id,
-    //     totalPrice: cartTotal,
-    //     paymentStatus: "PENDING",
-    //     slip: slipURL,
+    //     name: name,
+    //     detail: detail,
+    //     price: parseFloat(price),
+    //     categoryId: parseInt(categoryId),
+    //     image: uploadResult.secure_url || "",
     //   },
     // });
-    // console.log(createInOrder);
 
-    // await Promise.all(update.map((updated) => prisma.product.update(updated)));
-
-    // await prisma.cart.deleteMany({
-    //   where: { orderedById: Number(req.user.id) },
-    // });
     res.json("hi");
     // res.json({ ok: true, order });
   } catch (err) {
