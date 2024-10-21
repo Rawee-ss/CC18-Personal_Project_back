@@ -49,46 +49,4 @@ exports.adminCheck = async (req, res, next) => {
   }
 };
 
-// module.exports = (roles = []) => {
-//   return async (req, res, next) => {
-//     const authorization = req.headers.authorization;
-//     if (!authorization || !authorization.startsWith("Bearer ")) {
-//       createError(401, "Unauthorized 1");
-//     }
-//     const token = authorization.split(" ")[1];
-//     try {
-//       if (!token) {
-//         createError(401, "Unauthorized");
-//       }
 
-//       const payload = jwt.verify(token, process.env.JWT_SECRET);
-//       const foundUser = await prisma.user.({
-//         where: { id: payload.id },
-//       });
-//       if (!foundUser || !roles.includes(foundUser.role)) {
-//         return next(createError(403, "Forbidden: Access denied"));
-//       }
-
-//       req.user = foundUser;
-//       next();
-//     } catch (err) {
-//       next(err);
-//     }
-//   };
-// };
-
-// exports.authorization = (req, res, next) => {
-//   const token = req.header('Authorization').replace('Bearer ', '');
-
-//   if (!token) {
-//     return res.status(401).json({ error: 'Unauthorized' });
-//   }
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//     req.user = decoded;
-//     next();
-//   } catch (err) {
-//     res.status(401).json({ error: 'Invalid token' });
-//   }
-// };

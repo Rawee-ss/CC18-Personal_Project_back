@@ -11,8 +11,8 @@ productRoute.post(
   upload.single("image"),
   productController.createProduct
 );
-productRoute.get("/:count", productController.getAllProduct); //ข้อมูลที่จะแสดงมีกี่ตัว
-productRoute.post("/productby", productController.productby);
+productRoute.get("/:count", productController.getAllProduct); 
+// productRoute.post("/productby", productController.productby);
 productRoute.post("/search/filters", productController.searchFilters);
 productRoute.patch(
   "/:id",
