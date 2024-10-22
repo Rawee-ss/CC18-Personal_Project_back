@@ -1,20 +1,24 @@
 const prisma = require("../config/prisma");
 const { cartItem } = require("../config/prisma");
 const cloudinary = require("../config/cloudinary");
-const fs = require("fs");
+const fs = require("fs/promises");
+const path = require("path");
 
 exports.getOrder = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    console.log(id);
-    const getOrder = await prisma.products.findUnique({
+    const userId = req.user.id;
+    console.log('userId', userId)
+
+    const getOrder = await prisma.orders.findMany({
       where: {
-        id: +id,
+        userId
       },
-      select: {
-        id: true,
-        name: true,
-        price: true,
+      include: {
+        orderItem: {
+          include:{
+            products:true
+          }
+        },
       },
     });
     res.json({ getOrder });
@@ -26,20 +30,53 @@ exports.getOrder = async (req, res, next) => {
 // ทำใหม่
 exports.createOrder = async (req, res, next) => {
   try {
-    const { id, name, slip, totalPrice, cartId } = req.body;
+    const { id, name, slip, totalPrice, cart, cartId } = req.body;
+    const userId = req.user.id;
+
     console.log("req.body", req.body);
-    console.log(req.file)
+    console.log(path.parse(req.file.path).name);
     const haveFile = !!req.file;
     let uploadResult = {};
-    console.log(path.parse(req.file.path).name);
-    // if (haveFile) {
-    //   uploadResult = await cloudinary.uploader.upload(req.file.path, {
-    //     overwrite: true,
+    // console.log(path.parse(req.file.path).name);
+    if (haveFile) {
+      uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        overwrite: true,
 
-    //     public_id: path.parse(req.file.path).name,
-    //   });
-    //   await fs.unlink(req.file.path);
-    // }
+        public_id: path.parse(req.file.path).name,
+      });
+      await fs.unlink(req.file.path);
+    }
+    console.log(uploadResult);
+
+    const cartExist = await prisma.cart.findFirst({
+      where: { userId },
+    });
+
+    const findCartItem = await prisma.cartItem.findMany();
+
+    console.log("findCartItem", findCartItem);
+
+    const payment = await prisma.orders.create({
+      data: {
+        totalPrice: req.body.totalPrice,
+        cartId: +req.body.cartId,
+        userId: req.user.id,
+        slip: uploadResult.secure_url,
+        cartId: cartExist.id,
+      },
+    });
+
+    for (let item of findCartItem) {
+      await prisma.orderItem.create({
+        data: {
+          price: item.price,
+          productsId: item.productsId,
+          ordersId: payment.id,
+        },
+      });
+    }
+
+    await prisma.cartItem.deleteMany();
 
     // const product = await prisma.products.create({
     //   data: {

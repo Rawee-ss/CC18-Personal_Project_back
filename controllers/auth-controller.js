@@ -87,6 +87,7 @@ exports.currentUser = async (req, res, next) => {
         id: true,
         userName: true,
         role: true,
+        email:true
       },
     });
     res.json({ member });

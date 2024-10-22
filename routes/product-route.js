@@ -22,6 +22,6 @@ productRoute.patch(
   upload.single('image'),
   productController.updateProduct
 );
-productRoute.delete("/:id", productController.deleteProduct);
+productRoute.delete("/:productId", productController.deleteProduct);
 
 module.exports = productRoute;

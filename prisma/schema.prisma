@@ -22,7 +22,7 @@ model User {
   userName  String     @unique @map("user_name")
   password  String
   email     String?    @unique
-  role      Role       @default(USER)
+  role      Role?       @default(USER)
   favorite  Favorite[]
   store     Store[]
   cart      Cart[]

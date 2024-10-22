@@ -8,6 +8,7 @@ exports.getAllProduct = async (req, res, next) => {
     // code
     const { count } = req.params;
     const products = await prisma.products.findMany({
+      where:{isDelete:false},
       take: parseInt(count),
       orderBy: { createdAt: "desc" },
       include: {
@@ -88,12 +89,20 @@ exports.updateProduct = async (req, res, next) => {
   try {
     const { name, image, price, detail, categoryId } = req.body;
     const { id } = req.params;
+    console.log("file",req.file)
 
     console.log(id, "Product id");
 
+    const data = {
+      name: name,
+      detail: detail,
+      price: parseFloat(price),
+      categoryId: parseInt(categoryId),
+    }
+
     const haveFile = !!req.file;
     let uploadResult = {};
-    console.log(path.parse(req.file.path).name);
+    // console.log(path.parse(req.file.path).name);
     if (haveFile) {
       uploadResult = await cloudinary.uploader.upload(req.file.path, {
         overwrite: true,
@@ -101,17 +110,13 @@ exports.updateProduct = async (req, res, next) => {
         public_id: path.parse(req.file.path).name,
       });
       await fs.unlink(req.file.path);
+
+      data.image =  uploadResult.secure_url
     }
 
     const product = await prisma.products.update({
       where: { id: +id },
-      data: {
-        name: name,
-        detail: detail,
-        price: parseFloat(price),
-        categoryId: parseInt(categoryId),
-        image: uploadResult.secure_url || "",
-      },
+      data
     });
     res.json(product);
   } catch (err) {
@@ -120,10 +125,11 @@ exports.updateProduct = async (req, res, next) => {
 };
 
 exports.deleteProduct = async (req, res, next) => {
-  const { id } = req.params;
+  const { productId: id } = req.params;
+  console.log(req.params)
   try {
     await prisma.products.update({
-      where: { id: parseInt(id) },
+      where: { id: Number(id) },
       data: { isDelete: true },
     });
 

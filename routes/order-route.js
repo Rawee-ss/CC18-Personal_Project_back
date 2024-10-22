@@ -4,7 +4,7 @@ const orderController = require("../controllers/order-controller");
 const { authCheck } = require("../middleware/authenticate");
 const upload = require("../middleware/upload");
 
-orderRoute.get("/:id", authCheck, orderController.getOrder);
+orderRoute.get("/", authCheck, orderController.getOrder);
 orderRoute.post(
   "/",
   authCheck,

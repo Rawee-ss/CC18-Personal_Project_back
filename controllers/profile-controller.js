@@ -22,24 +22,27 @@ exports.getUserProfile = async (req, res, next) => {
 
 exports.updateUserProfile = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, image, userName, role } = req.body;
-    //code
-    const { id } = req.body;
+    const { password, email, userName, confirmPassword } = req.body;
+    console.log('req.user', req.user)
+    const { id } = req.user;
     console.log(id);
+
+    const  data = {
+      email,
+      userName,
+    }
+
+    if(password && confirmPassword) {
+      data.password = password
+      data.confirmPassword = confirmPassword
+    }
+
     const user = await prisma.user.update({
       where: { id: Number(id) },
-      data: {
-        firstName,
-        lastName,
-        email,
-        image,
-        userName,
-        password,
-        role,
-      },
+      data
     });
 
-    res.json("Update Status Success", user);
+    res.json({ meaasge:"Update Status Success", user});
   } catch (err) {
     next(err);
   }
