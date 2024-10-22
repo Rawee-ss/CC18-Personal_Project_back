@@ -28,6 +28,7 @@ exports.createOrder = async (req, res, next) => {
   try {
     const { id, name, slip, totalPrice, cartId } = req.body;
     console.log("req.body", req.body);
+    console.log(req.file)
     const haveFile = !!req.file;
     let uploadResult = {};
     console.log(path.parse(req.file.path).name);

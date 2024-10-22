@@ -103,6 +103,7 @@ exports.getItemCart = async (req, res, next) => {
     });
     // console.log(cart)
     res.json({
+      cartId: cart.id,
       cartItem: cart.cartItem,
       cartTotal: cart.cartTotal,
     });
@@ -113,7 +114,10 @@ exports.getItemCart = async (req, res, next) => {
 
 exports.deleteItemCart = async (req, res, next) => {
   try {
-    const { cartItemId } = req.body;
+    // const { cartItemId } = req.body;
+    const { cartItemId } = req.params;
+
+    console.log("cartItemId", cartItemId);
     if (!cartItemId) {
       return res.status(400).json({ message: "cartItemId is required" });
     }
@@ -125,10 +129,10 @@ exports.deleteItemCart = async (req, res, next) => {
       return res.json(400, "No cart");
     }
     await prisma.cartItem.findUnique({
-      where: { id: cartItemId },
+      where: { id: Number(cartItemId) },
     });
     await prisma.cartItem.delete({
-      where: { id: cartItemId },
+      where: { id: Number(cartItemId) },
     });
 
     res.json("Cart remove item Success");
