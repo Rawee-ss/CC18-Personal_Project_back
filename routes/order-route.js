@@ -11,6 +11,7 @@ orderRoute.post(
   upload.single("image"),
   orderController.createOrder
 );
+orderRoute.patch("/update-status", orderController.updateOrderStatus);
 orderRoute.delete("/:id", orderController.deleteOrder);
 
 module.exports = orderRoute;

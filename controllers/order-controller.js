@@ -7,17 +7,17 @@ const path = require("path");
 exports.getOrder = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    console.log('userId', userId)
+    console.log("userId", userId);
 
     const getOrder = await prisma.orders.findMany({
       where: {
-        userId
+        userId,
       },
       include: {
         orderItem: {
-          include:{
-            products:true
-          }
+          include: {
+            products: true,
+          },
         },
       },
     });
@@ -104,6 +104,21 @@ exports.deleteOrder = async (req, res, next) => {
     });
 
     res.json("delete order");
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  const { orderId, paymentStatus } = req.body;
+
+  try {
+    const updatedOrder = await prisma.orders.update({
+      where: { id: orderId },
+      data: { paymentStatus: paymentStatus },
+    });
+
+    res.json(200,"Order status updated", updatedOrder );
   } catch (err) {
     next(err);
   }
