@@ -22,7 +22,7 @@ model User {
   userName  String     @unique @map("user_name")
   password  String
   email     String?    @unique
-  role      Role?       @default(USER)
+  role      Role?      @default(USER)
   favorite  Favorite[]
   store     Store[]
   cart      Cart[]
@@ -42,8 +42,8 @@ model Products {
   price      Decimal     @db.Decimal(10, 2)
   createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   isDelete   Boolean     @default(false)
-  categoryId Int         @map("category_id")
-  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int?        @map("category_id")
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   favorite   Favorite[]
   store      Store[]
   orderItem  OrderItem[]

@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { prisma } = require("../config/prisma");
+const prisma = require("../config/prisma");
 
 async function run() {
   await prisma.$executeRawUnsafe("DROP DATABASE cc18_personal_pj");

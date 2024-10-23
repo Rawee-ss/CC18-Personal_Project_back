@@ -1,4 +1,4 @@
-const { prisma } = require("../config/prisma");
+const prisma = require("../config/prisma");
 const bcrypt = require("bcryptjs");
 
 const hashedPassword = bcrypt.hashSync("123456", 10); // hash no async
@@ -19,27 +19,39 @@ const usersData = [
 
   {
     userName: "Bobby",
-    email: "anny@games.com",
+    email: "bobby@games.com",
     password: hashedPassword,
     role: "USER",
   },
   {
     userName: "Candy",
-    email: "anny@games.com",
+    email: "candy@games.com",
     password: hashedPassword,
     role: "USER",
   },
   {
     userName: "Danny",
-    email: "anny@games.com",
+    email: "danny@games.com",
     password: hashedPassword,
     role: "USER",
   },
 ];
 
+const gamesData =[
+  {
+    name:"Dota 2",
+    image:"https://i.pinimg.com/564x/80/ba/ed/80baed0c6e4c5c67fce67ca2d29ba66f.jpg",
+    detail:"123",
+    price:"100"
+  }
+]
+
 async function run() {
   await prisma.user.createMany({
     data: usersData,
+  });
+  await prisma.products.createMany({
+    data: gamesData,
   });
 }
 

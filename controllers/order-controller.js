@@ -27,7 +27,47 @@ exports.getOrder = async (req, res, next) => {
   }
 };
 
-// ทำใหม่
+exports.getItemOrder = async (req, res, next) => {
+  try {
+    const order = await prisma.orders.findFirst({
+      include: {
+        orderItem: {
+          include: {
+            products: true,
+          },
+        },
+      },
+    });
+    // console.log(order)
+    res.json({
+      ordersId: order.id,
+      orderItem: order.orderItem,
+      paymentStatus: order.paymentStatus,
+      totalPrice: order.totalPrice,
+      slip: order.slip,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAllOrder = async (req, res, next) => {
+  try {
+    const getAllOrder = await prisma.orders.findMany({
+      include: {
+        orderItem: {
+          include: {
+            products: true,
+          },
+        },
+      },
+    });
+    res.json({ getAllOrder });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.createOrder = async (req, res, next) => {
   try {
     const { id, name, slip, totalPrice, cart, cartId } = req.body;
@@ -78,16 +118,6 @@ exports.createOrder = async (req, res, next) => {
 
     await prisma.cartItem.deleteMany();
 
-    // const product = await prisma.products.create({
-    //   data: {
-    //     name: name,
-    //     detail: detail,
-    //     price: parseFloat(price),
-    //     categoryId: parseInt(categoryId),
-    //     image: uploadResult.secure_url || "",
-    //   },
-    // });
-
     res.json("hi");
     // res.json({ ok: true, order });
   } catch (err) {
@@ -109,16 +139,19 @@ exports.deleteOrder = async (req, res, next) => {
   }
 };
 
-exports.updateOrderStatus = async (req, res) => {
-  const { orderId, paymentStatus } = req.body;
+exports.updateOrderStatus = async (req, res, next) => {
+  const { ordersId, paymentStatus } = req.body;
+  console.log("hi order", ordersId);
+  console.log("hi paymentStatus", paymentStatus);
 
   try {
     const updatedOrder = await prisma.orders.update({
-      where: { id: orderId },
+
+      where: { id: ordersId },
       data: { paymentStatus: paymentStatus },
     });
 
-    res.json(200,"Order status updated", updatedOrder );
+    res.json(updatedOrder);
   } catch (err) {
     next(err);
   }
