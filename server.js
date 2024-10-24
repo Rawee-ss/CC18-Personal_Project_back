@@ -25,7 +25,7 @@ app.use("/profile", profileRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
 app.use("/favorite", favoriteRoute);
-app.use("/store", storeRoute);
+app.use("/store-product", storeRoute);
 
 app.use(notFound);
 app.use(error);

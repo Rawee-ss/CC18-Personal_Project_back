@@ -28,8 +28,12 @@ exports.getOrder = async (req, res, next) => {
 };
 
 exports.getItemOrder = async (req, res, next) => {
+  const { id } = req.params;
   try {
     const order = await prisma.orders.findFirst({
+      where: {
+        id: Number(id),
+      },
       include: {
         orderItem: {
           include: {
@@ -140,16 +144,34 @@ exports.deleteOrder = async (req, res, next) => {
 };
 
 exports.updateOrderStatus = async (req, res, next) => {
-  const { ordersId, paymentStatus } = req.body;
-  console.log("hi order", ordersId);
+  const { paymentStatus } = req.body;
+  const {id} = req.params
+  console.log(req.body)
+  console.log("hi order==", id);
   console.log("hi paymentStatus", paymentStatus);
 
   try {
     const updatedOrder = await prisma.orders.update({
-
-      where: { id: ordersId },
+      where: { id: +id },
       data: { paymentStatus: paymentStatus },
     });
+
+    console.log('updatedOrder', updatedOrder)
+
+    const getOrder = await prisma.orderItem.findMany({
+      where:{ordersId: +id}
+    })
+
+  { for(let item of getOrder) {
+    await prisma.store.create({
+      data:{
+        userId: updatedOrder.userId,
+        productsId: item.productsId
+      }
+    })
+  }}
+
+    
 
     res.json(updatedOrder);
   } catch (err) {

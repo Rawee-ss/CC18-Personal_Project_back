@@ -37,8 +37,8 @@ enum Role {
 model Products {
   id         Int         @id @default(autoincrement())
   name       String
-  detail     String
-  image      String
+  detail     String      @db.VarChar(5000)
+  image      String      @db.VarChar(10000)
   price      Decimal     @db.Decimal(10, 2)
   createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(0)
   isDelete   Boolean     @default(false)
@@ -103,7 +103,7 @@ model Store {
   status     Status   @default(UNINSTALL)
   userId     Int      @map("user_id")
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productsId Int      @map("products_id")
+  productsId Int      @map("products_id") @unique
   products   Products @relation(fields: [productsId], references: [id], onDelete: Cascade)
 }
 

@@ -6,7 +6,7 @@ const upload = require("../middleware/upload");
 
 orderRoute.get("/", authCheck, orderController.getOrder);
 orderRoute.get("/all", authCheck, adminCheck, orderController.getAllOrder);
-orderRoute.get("/update-status", authCheck, adminCheck, orderController.getItemOrder);
+orderRoute.get("/update-status/:id", authCheck, orderController.getItemOrder);
 orderRoute.patch(
   "/",
   authCheck,
@@ -17,6 +17,7 @@ orderRoute.patch(
   "/update-status/:id",
   authCheck,
   adminCheck,
+  upload.single("image"),
   orderController.updateOrderStatus
 );
 orderRoute.delete("/:id", orderController.deleteOrder);
