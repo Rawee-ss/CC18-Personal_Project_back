@@ -22,33 +22,47 @@ exports.addItemCart = async (req, res, next) => {
       });
     }
 
-    const existingstore = await prisma.store.findFirst({
+    const existinStore = await prisma.store.findFirst({
       where: {
         userId: id,
         productsId: +productsId,
       },
     });
 
-    if (existingstore) {
+    if (existinStore) {
       return createError(
         400,
         "Product already in store. Only one item can be added."
       );
     }
 
-    const existingCartItem = await prisma.cartItem.findFirst({
+    const existinCartItem = await prisma.cartItem.findFirst({
       where: {
         cart: { userId: id },
         productsId: +productsId,
       },
     });
 
-    if (existingCartItem) {
+    if (existinCartItem) {
       return createError(
         400,
         "Product already in cart. Only one item can be added."
       );
     }
+
+    const existinOrder = await prisma.orderItem.findFirst({
+      where: {
+        orders: { userId: id },
+        productsId: +productsId,
+      },
+    });
+    if (existinOrder) {
+      return createError(
+        400,
+        "Product already in order. Only one item can be added."
+      );
+    }
+
     const findProduct = await prisma.products.findFirst({
       where: {
         id: +productsId,

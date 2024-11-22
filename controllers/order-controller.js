@@ -145,8 +145,8 @@ exports.deleteOrder = async (req, res, next) => {
 
 exports.updateOrderStatus = async (req, res, next) => {
   const { paymentStatus } = req.body;
-  const {id} = req.params
-  console.log(req.body)
+  const { id } = req.params;
+  console.log(req.body);
   console.log("hi order==", id);
   console.log("hi paymentStatus", paymentStatus);
 
@@ -156,22 +156,24 @@ exports.updateOrderStatus = async (req, res, next) => {
       data: { paymentStatus: paymentStatus },
     });
 
-    console.log('updatedOrder', updatedOrder)
+    console.log("updatedOrder", updatedOrder);
 
-    const getOrder = await prisma.orderItem.findMany({
-      where:{ordersId: +id}
-    })
+    if (paymentStatus == "COMPLETED") {
+      const getOrder = await prisma.orderItem.findMany({
+        where: { ordersId: +id },
+      });
 
-  { for(let item of getOrder) {
-    await prisma.store.create({
-      data:{
-        userId: updatedOrder.userId,
-        productsId: item.productsId
+      {
+        for (let item of getOrder) {
+          await prisma.store.create({
+            data: {
+              userId: updatedOrder.userId,
+              productsId: item.productsId,
+            },
+          });
+        }
       }
-    })
-  }}
-
-    
+    }
 
     res.json(updatedOrder);
   } catch (err) {
